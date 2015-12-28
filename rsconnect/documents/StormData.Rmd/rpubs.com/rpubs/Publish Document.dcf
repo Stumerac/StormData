@@ -1,0 +1,7 @@
+name: Publish Document
+account: rpubs
+server: rpubs.com
+bundleId:
+        https://api.rpubs.com/api/v1/document/138576/9c083e2b74774fd39f49cf8cfd6a3b23
+url: http://rpubs.com/Stumerac/138576
+when: 1451262353.11196

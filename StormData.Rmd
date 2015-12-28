@@ -1,0 +1,77 @@
+---
+title: "Storm Event Health and Economic Impacts"
+author: "Christopher Donn"
+date: "December 27, 2015"
+output: html_document
+---
+
+#Abstract
+A simple list of ten storm events that have caused the fatalities, injuries and property damage ranked from highest to lowest. Data came from the U.S. National Oceanic and Atmopheric Administration's storm database.  Data was collected from 1950 through Novemeber 2011 for the United States of America.  These figures represent the difference in the sum of each category: fatalities, injuries and property damage.
+
+#Data Processing
+Retrieve storm data from the NOAA Storm database at https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2
+
+``` {r}
+url <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2"
+download.file(url, "./StormData.csv.bz2", mode = "wb")
+StormData <- read.csv("StormData.csv.bz2")
+```
+
+##Create a data frame that contains the variables eventType, fatalities, injuries and property damage.  
+
+``` {r}
+#list of event types in dataset
+eventTypes <- unique( StormData$EVTYPE )
+#initialize a list of the sum of fatalities for each event
+healthList <- NULL
+firstEventObs <- subset( StormData, StormData$EVTYPE == eventTypes[1] )
+healthList <- cbind( as.character( eventTypes[1] ), as.numeric( sum ( firstEventObs$FATALITIES ) ), as.numeric( sum( firstEventObs$INJURIES ) ), as.numeric( sum( firstEventObs$PROPDMG) ) )
+
+#create a data frame with variables eventType, fatalities, and injuries.  
+for ( i in 2:length( eventTypes ) ) {
+    eventObs <- subset( StormData, StormData$EVTYPE == eventTypes[i] )
+    newRow <- c( as.character( eventTypes[i] ), as.numeric(sum ( eventObs$FATALITIES )), as.numeric( sum ( eventObs$INJURIES ) ), sum( as.numeric( eventObs$PROPDMG ) ) )
+    healthList <- rbind( healthList, newRow ) 
+}
+options(warn = -1)
+healthListData <- data.frame(healthList)
+names(healthListData) = c( "eventType", "fatalities", "injuries", "propDmg")
+healthListData$fatalities <- as.character(healthListData$fatalities)
+healthListData$injuries <- as.character( healthListData$injuries)
+healthListData$propDmg <- as.character( healthListData$propDmg)
+healthListData$fatalities <- as.numeric(healthListData$fatalities)
+healthListData$injuries <- as.numeric( healthListData$injuries)
+healthListData$propDmg <- as.numeric( healthListData$propDmg)
+```
+
+##Sort the dataframe in order of storm events with the most fatalities to storm events with the least.  Display the top 10 most fatal events.
+
+``` {r}
+tenFatal <- healthListData[order(-healthListData$fatalities),]
+head(tenFatal, 10)
+
+plot(head(tenFatal$fatalities,10), head(tenFatal$eventTypes,10), xlab = "Storm Events" , ylab = "Fatalities", type = "l" )
+```
+
+##Sort the dataframe in order of injuries.  Display the top ten storm events with the most injuries.
+``` {r}
+tenInjury <- healthListData[order(-healthListData$injuries),]
+head(tenInjury, 10)
+plot(head(tenInjury$injuries, 10), head(tenInjury$eventTypes,10), xlab = "Storm Events" , ylab = "Injuries", type = "l" )
+```
+
+##Sort by most property damage.  Again, display the top ten.
+
+``` {r}
+tenProp <- healthListData[order(-healthListData$propDmg),]
+head(tenProp, 10)
+plot(head(tenProp$propDmg, 10), head(tenProp$eventTypes,10), xlab = "Storm Events" , ylab = "propDmg", type = "l" )
+```
+
+
+
+
+
+
+
+
